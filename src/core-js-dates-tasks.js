@@ -149,10 +149,19 @@ function isDateInPeriod(date, period) {
  * '1999-01-05T02:20:00.000Z' => '1/5/1999, 2:20:00 AM'
  * '2010-12-15T22:59:00.000Z' => '12/15/2010, 10:59:00 PM'
  */
-function formatDate(/* date */) {
-  throw new Error('Not implemented');
+function formatDate(date) {
+  const options = {
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    second: 'numeric',
+    hour12: true,
+    timeZone: 'UTC',
+  };
+  return Intl.DateTimeFormat('en-US', options).format(new Date(date));
 }
-
 /**
  * Returns the total number of weekend days (Saturdays and Sundays) in a specified month and year.
  *
@@ -165,8 +174,27 @@ function formatDate(/* date */) {
  * 12, 2023 => 10
  * 1, 2024 => 8
  */
-function getCountWeekendsInMonth(/* month, year */) {
-  throw new Error('Not implemented');
+function getCountWeekendsInMonth(month, year) {
+  let date = new Date(year, month - 1);
+  let weekendCounter = 0;
+  while (date.getMonth() === month - 1) {
+    switch (date.getDay()) {
+      case 5:
+        date.setDate(date.getDate() + 1);
+        break;
+      case 6:
+        weekendCounter += 1;
+        date.setDate(date.getDate() + 1);
+        break;
+      case 0:
+        weekendCounter += 1;
+        date = getNextFriday(date);
+        break;
+      default:
+        date = getNextFriday(date);
+    }
+  }
+  return weekendCounter;
 }
 
 /**
